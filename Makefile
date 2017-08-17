@@ -2,7 +2,7 @@
 #CFLAGS       = -Wall -mmcu=atmega16 -Os -Wl,-Map,test.map
 #OBJCOPY      = avr-objcopy
 CC           = gcc
-CFLAGS       = -Wall -Os -Wl,-Map,test.map
+CFLAGS       = -Wall -Os
 OBJCOPY      = objcopy
 
 # include path to AVR library
@@ -22,13 +22,17 @@ test.o : test.c
 	# compiling test.c
 	$(CC) $(CFLAGS) -c test.c -o test.o
 
-aes.o : aes.h aes.c
+aes.o : aes.h aesni.h aes.c
 	# compiling aes.c
 	$(CC) $(CFLAGS) -c aes.c -o aes.o
 
-test.out : aes.o test.o
+aesni.o : aesni.h aesni.c
+	# compiling aes.c
+	$(CC) $(CFLAGS) -c aesni.c -o aesni.o
+
+test.out : aes.o aesni.o test.o
 	# linking object code to binary
-	$(CC) $(CFLAGS) aes.o test.o -o test.out
+	$(CC) $(CFLAGS) aes.o aesni.o test.o -o test.out
 
 small: test.out
 	$(OBJCOPY) -j .text -O ihex test.out rom.hex
